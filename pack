@@ -1,0 +1,42 @@
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.reflect.Method;
+
+// Создание аннотации
+@Retention(RetentionPolicy.RUNTIME)
+@interface RunMe {
+    String value();
+}
+
+// Класс с методами, аннотированными аннотацией RunMe
+class TestClass {
+    @RunMe("Привет из метода 1")
+    public void method1() {
+        System.out.println("method1 выполнен");
+    }
+
+    @RunMe("Привет из метода 2")
+    public void method2() {
+        System.out.println("method2 выполнен");
+    }
+
+    public void method3() {
+        System.out.println("method3 выполнен, но без аннотации");
+    }
+}
+
+public class AnnotationProcessor {
+    public static void main(String[] args) throws Exception {
+        TestClass obj = new TestClass();
+        Class<?> clazz = obj.getClass();
+
+        // Поиск и выполнение методов с аннотацией RunMe
+        for (Method method : clazz.getDeclaredMethods()) {
+            if (method.isAnnotationPresent(RunMe.class)) {
+                RunMe annotation = method.getAnnotation(RunMe.class);
+                System.out.println("Сообщение аннотации: " + annotation.value());
+                method.invoke(obj);
+            }
+        }
+    }
+}
